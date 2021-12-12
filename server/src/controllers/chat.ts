@@ -1,7 +1,7 @@
-import MessageModel from '../models/message';
 import { EventEmitter } from 'events';
 import { NextFunction, Request, Response } from 'express';
 import { NewMessage, Message } from '../types/message';
+import chatService from '../services/chat';
 
 const emitter = new EventEmitter();
 let online: string[] = [];
@@ -13,10 +13,9 @@ const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
       content: <string>req.body.content,
       timestamp: Date.now(),
     };
-    const { email, content, timestamp } = message;
-    await MessageModel.create({ email, content, timestamp });
-    res.status(200).send("Message Sent");
-    emitter.emit('message', { email, content, timestamp });
+    const sentMessage = await chatService.sendMessage(message);
+    res.json({ sentMessage });
+    emitter.emit('message', sentMessage);
   } catch (err) {
     next(err);
   }
@@ -40,7 +39,7 @@ const getAllMessages = async (req: Request, res: Response, next: NextFunction) =
     emitter.addListener('online', sendOnlineUsers);
     emitter.emit('online');
 
-    const messages: Message[] = await MessageModel.find({});
+    const messages: Message[] = await chatService.getAllMessages();
 
     res.write(`data: ${JSON.stringify({ messages })} \n\n`);
 
@@ -54,7 +53,6 @@ const getAllMessages = async (req: Request, res: Response, next: NextFunction) =
     });
 
   } catch (err) {
-
     next(err);
   }
 };
