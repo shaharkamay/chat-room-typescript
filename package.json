@@ -1,0 +1,20 @@
+{
+  "name": "chat-room-typescript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shaharkamay/chat-room-typescript.git"
+  },
+  "keywords": [],
+  "author": "Shahar Kamay <shahar.kamay@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shaharkamay/chat-room-typescript/issues"
+  },
+  "homepage": "https://github.com/shaharkamay/chat-room-typescript#readme"
+}
