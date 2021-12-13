@@ -16,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/shaharkamay/chat-room-typescript/issues"
   },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.1.1",
+    "validator": "^13.7.0"
+  },
   "homepage": "https://github.com/shaharkamay/chat-room-typescript#readme"
 }
