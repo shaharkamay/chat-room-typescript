@@ -22,7 +22,7 @@ app.get("/ping", (req, res) => {
     console.log('pong');
     res.send("pong");
 });
-app.use(express_1.default.static("../client/build"));
+app.use(express_1.default.static("../app/client/build"));
 app.get("/", app_1.render);
 app.get("/login", app_1.render);
 app.get("/sign-up", app_1.render);

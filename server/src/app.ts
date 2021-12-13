@@ -21,7 +21,7 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-app.use(express.static("../client/build"));
+app.use(express.static("../app/client/build"));
 app.get("/", render);
 
 app.get("/login", render);

@@ -5,7 +5,7 @@ import path from 'path';
 
 const render = (req: Request, res: Response, next: NextFunction) => {
     try {
-        res.sendFile(path.resolve("../client/build/index.html"));
+        res.sendFile(path.resolve("../app/client/build/index.html"));
     } catch (err) {
         next(err);
     }

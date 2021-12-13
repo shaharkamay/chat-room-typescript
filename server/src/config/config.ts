@@ -11,7 +11,7 @@ const config = {
       autoIndex: false,
       retryWrites: false,
     },
-    url: process.env.MONGO_URI || '',
+    url: process.env.MONGO_URI || 'mongodb+srv://database-shaharkamay:vcVfXAHipeBiBEVztUi2@cluster0.mj3y0.mongodb.net/chat-room?retryWrites=true&w=majority',
   },
   server: {
     host: 'localhost',
