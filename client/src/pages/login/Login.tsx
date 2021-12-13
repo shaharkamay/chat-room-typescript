@@ -30,12 +30,11 @@ function Login() {
       placeholder: "Enter Email",
       state: email,
       setState: setEmail,
-      handleBlur: (e) => {
+      handleBlur: (e, setError) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         if (!validator.isEmail(e.target.value)) {
-          // setError('Invalid email');
-          console.log('Invalid email');
-        } else console.log('');
+          setError('Invalid email');
+        } else setError('');
       }
     },
     {
@@ -45,11 +44,11 @@ function Login() {
       placeholder: "Enter Password",
       state: password,
       setState: setPassword,
-      handleBlur: (e) => {
+      handleBlur: (e, setError) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         if (!validator.isStrongPassword(e.target.value, { minSymbols: 0 })) {
-          console.log('Password must contain at least one uppercase, one lowercase and one number');
-        } else console.log('');
+          setError('Password must contain at least one uppercase, one lowercase and one number');
+        } else setError('');
       }
     },
   ];
