@@ -1,0 +1,34 @@
+/*  
+Form
+*/
+.form {
+    padding: 1em 2em;
+    background-color: var(--background);
+    border-radius: var(--radius);
+}
+
+.form h2 {
+    text-align: center;
+    color: var(--foreground);
+    font-family: var(--font-title);
+}
+.form .form-element {
+    margin: var(--margin-top-element) 0;
+}
+.form .form-element label {
+    color: var(--foreground);
+}
+.form .form-element input {
+    padding: 0.7em;
+    display: block;
+    width: 100%;
+    border: 1px solid var(--clr-primary);
+    border-radius: var(--radius);
+}
+.form .form-element button {
+    width: 100%;
+}
+.form .invalid-message {
+    color: rgb(255, 60, 60);
+    font-size: 0.8rem;
+}

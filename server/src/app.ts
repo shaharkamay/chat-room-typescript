@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 // import morgan from 'morgan';
 // import morganHandler from './middleware/morgan.js';
-// import errorHandler from './error-handling/error-handler.js';
+import errorHandler from './error-handling/error-handler';
 import apiRouter from './routes/api';
-// import { render } from './controllers/app-controller.js';
+import { render } from './controllers/app';
 
 const app = express();
 
@@ -21,15 +21,15 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-// app.use(express.static("./build"));
-// app.get("/", render);
+app.use(express.static("../client/build"));
+app.get("/", render);
 
-// app.get("/login", render);
-// app.get("/sign-up", render);
-// app.get("/chat", render);
+app.get("/login", render);
+app.get("/sign-up", render);
+app.get("/chat", render);
 
 app.use('/api', apiRouter);
 
-// app.use(errorHandler);
+app.use(errorHandler);
 
 export default app;

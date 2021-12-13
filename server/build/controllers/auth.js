@@ -1,82 +1,60 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.signUp = exports.token = exports.login = void 0;
-const user_1 = __importDefault(require("../models/user"));
-const token_1 = __importDefault(require("../models/token"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const config_1 = __importDefault(require("../config/config"));
-const login = async (req, res, next) => {
+const auth_1 = __importDefault(require("../services/auth"));
+const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
-        const user = (await user_1.default.findOne({ email }));
-        if (!user)
-            throw { status: 400, message: "No such email" };
-        if (!(password === user.password))
-            throw { status: 400, message: "Bad password" };
-        const userId = user.id;
-        const accessToken = jsonwebtoken_1.default.sign({ email, userId }, config_1.default.jwt.secret, {
-            expiresIn: config_1.default.jwt.accessTime,
-        });
-        const refreshToken = jsonwebtoken_1.default.sign({ userId, email }, config_1.default.jwt.secret, {
-            expiresIn: config_1.default.jwt.refreshTime,
-        });
-        await token_1.default.findOneAndUpdate({ userId }, { jwt: refreshToken, userId }, { upsert: true, new: true, setDefaultsOnInsert: true });
-        res.send({ accessToken, refreshToken });
+        const tokens = yield auth_1.default.login(email, password);
+        res.json(tokens);
     }
     catch (err) {
         next(err);
     }
-};
+});
 exports.login = login;
-const token = async (req, res, next) => {
+const token = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = req.body.token;
-        if (!token)
-            throw { status: 400, message: "Must provide a token" };
-        const { email, userId } = jsonwebtoken_1.default.verify(token, config_1.default.jwt.secret);
-        const exists = await token_1.default.findOne({ jwt: token });
-        if (!exists)
-            throw { status: 400, message: "Log in again" };
-        const accessToken = jsonwebtoken_1.default.sign({ email, userId }, config_1.default.jwt.secret, {
-            expiresIn: config_1.default.jwt.accessTime,
-        });
-        res.send({ accessToken, email, userId });
+        const dataObj = yield auth_1.default.token(token);
+        res.json(dataObj);
     }
     catch (err) {
         next(err);
     }
-};
+});
 exports.token = token;
-const signUp = async (req, res, next) => {
+const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { firstName, lastName, email, password } = req.body;
-        const exists = await user_1.default.find({ email });
-        if (exists.length > 0)
-            throw { status: 400, message: "email already exists" };
-        await user_1.default.create({
-            first_name: firstName,
-            last_name: lastName,
-            email,
-            password,
-        });
-        res.send({ isSignedUp: true });
+        const isSignedUp = yield auth_1.default.signUp(firstName, lastName, email, password);
+        res.send({ isSignedUp });
     }
     catch (err) {
         next(err);
     }
-};
+});
 exports.signUp = signUp;
-const logout = async (req, res, next) => {
+const logout = (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = res.locals.user;
-        await token_1.default.deleteOne({ userId });
-        res.send(200);
+        const isLoggedOut = yield auth_1.default.logout(userId);
+        res.json({ isLoggedOut });
     }
     catch (err) {
         next(err);
     }
-};
+});
 exports.logout = logout;
