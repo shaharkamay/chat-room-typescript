@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import { FormElementType } from "../../types/form";
 import InvalidMessage from "./InvalidMessage";
 
