@@ -16,7 +16,7 @@ export type FormElementType = {
   placeholder: string,
   state: string,
   setState: Dispatch<SetStateAction<string>>,
-  handleBlur: ((e: { target: { value: string; }; }) => void),
+  handleBlur: ((e: { target: { value: string; }; }, setError: Dispatch<SetStateAction<string>>) => void),
 };
 
 export type InvalidMessageType = {

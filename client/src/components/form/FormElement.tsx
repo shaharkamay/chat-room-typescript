@@ -1,11 +1,10 @@
-// import React, { useState } from "react";
-import React from "react";
+import React, { useState } from "react";
 
 import { FormElementType } from "../../types/form";
-// import InvalidMessage from "./InvalidMessage";
+import InvalidMessage from "./InvalidMessage";
 
 function FormElement({ labelValue, type, id, placeholder, state, setState, handleBlur }: FormElementType) {
-  // const [error, setError] = useState();
+  const [error, setError] = useState('');
   return (
     <div className="form-element">
       <label htmlFor={id}>{labelValue}</label>
@@ -15,11 +14,9 @@ function FormElement({ labelValue, type, id, placeholder, state, setState, handl
         placeholder={placeholder}
         value={state}
         onChange={e => setState(e.target.value)}
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        // onBlur={e => handleBlur(e, setError)}
-        onBlur={e => handleBlur(e)}
+        onBlur={e => handleBlur(e, setError)}
       />
-      {/* <InvalidMessage id={`${id}-invalid-message`} value={error} /> */}
+      <InvalidMessage id={`${id}-invalid-message`} value={error} />
     </div>
   );
 }
