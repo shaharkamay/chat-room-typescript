@@ -28,9 +28,7 @@ For now, the chat room has no deployment so to use it you need to do The followi
 5. `npm start` to run the server 
 6. On the second terminal `cd client`
 7. `npm i` on this folder
-8. `npm run start` on this `Chat-Room/client` root to run the client side of the project
-
-##### Note that you can run `npm i` on the main root folder and add the `.env` inside it and run `npm start`.
+8. `npm run start` on this `chat-Room-typescript/client` root to run the client side of the project
 
 ## Languages and Tools:
 
