@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logout = exports.signUp = exports.token = exports.login = void 0;
+exports.disable2FA = exports.enable2FA = exports.check2FA = exports.logout = exports.signUp = exports.token = exports.login = void 0;
 const auth_1 = __importDefault(require("../services/auth"));
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -58,3 +58,45 @@ const logout = (_req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.logout = logout;
+const check2FA = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const email = res.locals.user.email;
+        console.log(email);
+        const is2FAEnabled = yield auth_1.default.twoFactor.check2FA(email);
+        res.json({ is2FAEnabled });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.check2FA = check2FA;
+const enable2FA = (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const email = res.locals.user.email;
+        const is2FAEnabled = yield auth_1.default.twoFactor.enable2FA(email);
+        if (is2FAEnabled) {
+            res.json({ is2FAEnabled });
+        }
+        else
+            return next({ status: '500', message: 'Could not enable 2FA' });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.enable2FA = enable2FA;
+const disable2FA = (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const email = res.locals.user.email;
+        const is2FADisabled = yield auth_1.default.twoFactor.disable2FA(email);
+        if (is2FADisabled) {
+            res.json({ is2FADisabled });
+        }
+        else
+            return next({ status: '500', message: 'Could not disable 2FA' });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.disable2FA = disable2FA;

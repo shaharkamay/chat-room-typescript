@@ -16,6 +16,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const config_1 = __importDefault(require("../config/config"));
 const token_1 = __importDefault(require("../models/token"));
 const user_1 = __importDefault(require("../models/user"));
+const twofactor = require("node-2fa");
 const login = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
     const user = (yield user_1.default.findOne({ email }));
     if (!user)
@@ -60,9 +61,49 @@ const logout = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const { deletedCount } = yield token_1.default.deleteOne({ userId });
     return deletedCount > 0;
 });
+const generateSecret = (options) => {
+    if (options) {
+        return twofactor.generateSecret({
+            name: options.name,
+            account: options.account,
+        });
+    }
+    else {
+        return twofactor.generateSecret();
+    }
+};
+const generateToken = (secret) => {
+    return twofactor.generateToken(secret);
+};
+const verifyToken = (secret, token) => {
+    return twofactor.verifyToken(secret, token);
+};
+const check2FA = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_1.default.findOne({ email });
+    if (user && user['2FA'])
+        return user['2FA'];
+    return false;
+});
+const enable2FA = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_1.default.findOneAndUpdate({ email }, { '2FA': true });
+    return user ? true : false;
+});
+const disable2FA = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_1.default.findOneAndUpdate({ email }, { '2FA': false });
+    return user ? true : false;
+});
+const twoFactor = {
+    generateSecret,
+    generateToken,
+    verifyToken,
+    check2FA,
+    enable2FA,
+    disable2FA
+};
 exports.default = {
     login,
     token,
     signUp,
-    logout
+    logout,
+    twoFactor,
 };

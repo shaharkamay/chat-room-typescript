@@ -22,6 +22,11 @@ const UserSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
+    '2FA': {
+        type: Boolean,
+        required: true,
+        default: false,
+    }
 });
 UserSchema.set("toJSON", {
     transform: (_, returnedObject) => {
