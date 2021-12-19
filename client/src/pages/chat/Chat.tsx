@@ -36,9 +36,11 @@ function Chat() {
       console.log("An error has occurred while receiving stream", error);
     };
     source.onmessage = function (event) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
+      // eslint-disable-next-line 
       const data = JSON.parse(event.data);
       if (data.messages) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         setMessages(data.messages);
       }
       if (data.newMessage) {
@@ -46,6 +48,7 @@ function Chat() {
         setMessages(messages => [...messages, data.newMessage]);
       }
       if (data.online) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         setOnline(data.online);
       }
     };

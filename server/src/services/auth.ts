@@ -2,7 +2,8 @@ import jwt from "jsonwebtoken";
 import config from "../config/config";
 import Token from "../models/token";
 import UserModel from "../models/user";
-import { NewUser, User } from "../types/user";
+import { NewUser, User, TwoFactorOptions } from "../types/user";
+import twofactor = require('node-2fa');
 
 const login = async (email: string, password: string): Promise<Record<string, unknown>> => {
   const user: User | null = (await UserModel.findOne({ email }));
@@ -65,9 +66,54 @@ const logout = async (userId: string): Promise<boolean> => {
   return deletedCount > 0;
 };
 
+const generateSecret = (options: TwoFactorOptions): { secret: string, uri: string, qr: string } => {
+  if (options) {
+    return twofactor.generateSecret({
+      name: options.name,
+      account: options.account,
+    });
+  } else {
+    return twofactor.generateSecret();
+  }
+};
+
+const generateToken = (secret: string): { token: string } | null => {
+  return twofactor.generateToken(secret);
+};
+
+const verifyToken = (secret: string, token: string): { delta: number } | null => {
+  return twofactor.verifyToken(secret, token);
+};
+
+const check2FA = async (email: string): Promise<boolean> => {
+  const user = await UserModel.findOne({ email });
+  if (user && user['2FA']) return user['2FA'];
+  return false;
+};
+
+const enable2FA = async (email: string): Promise<boolean> => {
+  const user = await UserModel.findOneAndUpdate({ email }, { '2FA': true });
+  return user ? true : false;
+};
+
+const disable2FA = async (email: string): Promise<boolean> => {
+  const user = await UserModel.findOneAndUpdate({ email }, { '2FA': false });
+  return user ? true : false;
+};
+
+const twoFactor = {
+  generateSecret,
+  generateToken,
+  verifyToken,
+  check2FA,
+  enable2FA,
+  disable2FA
+};
+
 export default {
   login,
   token,
   signUp,
-  logout
+  logout,
+  twoFactor,
 };
