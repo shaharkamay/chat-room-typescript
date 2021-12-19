@@ -40,9 +40,7 @@ const validate2FA = async (req: Request, res: Response, next: NextFunction) => {
     const twoFactorSecret = <string>req.headers.twofactorsecret;
     const twoFactorToken = <string>req.headers.twofactortoken;
     if (twoFactorSecret && twoFactorToken) {
-      console.log(twoFactorSecret, twoFactorToken);
       const isValid: { delta: number } | null = authService.twoFactor.verifyToken(twoFactorSecret, twoFactorToken);
-      console.log(isValid);
       if (isValid && isValid.delta === 0) {
         next();
       } else {

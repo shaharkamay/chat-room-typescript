@@ -59,7 +59,6 @@ function Login() {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const secret = await login({ email, password });
-      console.log(secret);
       if (secret) navigate('/2FA', {
         state: {
           email,

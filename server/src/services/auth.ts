@@ -85,11 +85,11 @@ const verifyToken = (secret: string, token: string): { delta: number } | null =>
   return twofactor.verifyToken(secret, token);
 };
 
-// const check2FA = async (email: string): Promise<boolean> => {
-//   const user = await UserModel.findOne({ email });
-//   if (user && user['2FA']) return user['2FA'];
-//   return false;
-// };
+const check2FA = async (email: string): Promise<boolean> => {
+  const user = await UserModel.findOne({ email });
+  if (user && user['2FA']) return user['2FA'];
+  return false;
+};
 
 const enable2FA = async (email: string): Promise<boolean> => {
   const user = await UserModel.findOneAndUpdate({ email }, { '2FA': true });
@@ -105,6 +105,7 @@ const twoFactor = {
   generateSecret,
   generateToken,
   verifyToken,
+  check2FA,
   enable2FA,
   disable2FA
 };

@@ -15,12 +15,21 @@ export const AuthProvider = ({ children }: any) => {
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("access") || ''
   );
+  const [is2FAEnabled, setIs2FAEnabled] = useState<boolean>(false);
 
   const askForNewToken = useCallback(async (refreshToken: string | null) => {
     return await axios.post(`${BASE_URL}/api/auth/token`, {
       token: refreshToken,
     });
   }, []);
+
+  const check2FA = useCallback(async () => {
+    return await axios.get(`${BASE_URL}/api/auth/2FA`, {
+      headers: {
+        auth: accessToken || '',
+      }
+    });
+  }, [loggedIn]);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -43,6 +52,21 @@ export const AuthProvider = ({ children }: any) => {
       }
     })();
   }, [refreshToken, askForNewToken, loggedIn]);
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    (async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const { data } = await check2FA();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        setIs2FAEnabled(data.is2FAEnabled);
+      } catch (error) {
+        console.log(error);
+        setIs2FAEnabled(false);
+      }
+    })();
+  }, [loggedIn, email, is2FAEnabled]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const login = useCallback(async ({ email, password }: { email: string, password: string }, headers: AxiosRequestHeaders | undefined = undefined): Promise<any> => {
@@ -108,8 +132,52 @@ export const AuthProvider = ({ children }: any) => {
     localStorage.removeItem("access");
   }, [accessToken]);
 
+
+
+  const enable2FA = useCallback(async (): Promise<boolean | undefined> => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const { data } = await axios.post(`${BASE_URL}/api/auth/2FA`, {}, {
+        headers: {
+          auth: accessToken || '',
+        }
+      });
+      if (data.is2FAEnabled) {
+        setIs2FAEnabled(true);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return data.is2FAEnabled;
+      }
+      else return false;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.isAxiosError) console.log(error.response.data.error);
+      else console.log(error);
+    }
+  }, [loggedIn]);
+
+  const disable2FA = useCallback(async (): Promise<boolean | undefined> => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const { data } = await axios.delete(`${BASE_URL}/api/auth/2FA`, {
+        headers: {
+          auth: accessToken || '',
+        }
+      });
+      if (data.is2FADisabled) {
+        setIs2FAEnabled(false);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return data.is2FADisabled;
+      }
+      else return false;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.isAxiosError) console.log(error.response.data.error);
+      else console.log(error);
+    }
+  }, [loggedIn]);
+
   return (
-    <AuthContext.Provider value={{ loggedIn, email, accessToken, login, logout, signUp }}>
+    <AuthContext.Provider value={{ loggedIn, email, accessToken, login, logout, signUp, is2FAEnabled, enable2FA, disable2FA }}>
       {children}
     </AuthContext.Provider>
   );

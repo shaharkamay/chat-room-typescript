@@ -21,7 +21,6 @@ function TwoFactor() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(state);
     if (loggedIn) navigate('/');
   }, [loggedIn, navigate]);
 
@@ -47,7 +46,6 @@ function TwoFactor() {
     if (login) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
       await login({ email: state.email, password: state.password }, { twoFactorToken: token, twoFactorSecret: state.secret.secret });
-      // console.log(secret);
     }
   };
 
