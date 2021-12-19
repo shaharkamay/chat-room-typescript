@@ -57,7 +57,17 @@ function Login() {
     e.preventDefault();
     if (login) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      await login({ email, password });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const secret = await login({ email, password });
+      console.log(secret);
+      if (secret) navigate('/2FA', {
+        state: {
+          email,
+          password,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          secret: secret
+        }
+      });
     }
   };
 

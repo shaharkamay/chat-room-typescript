@@ -46,4 +46,54 @@ const logout = async (_req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { login, token, signUp, logout };
+// const check2FA = async (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const email = <string>req.body.email;
+//     const is2FA = await authService.twoFactor.check2FA(email);
+//     res.json({ '2FA': is2FA });
+
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+const enable2FA = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const email = <string>req.body.email;
+    const isSet = await authService.twoFactor.enable2FA(email);
+    if (isSet) {
+      res.json({ email });
+    } else return next({ status: '500', message: 'Could not enable 2FA' });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+const disable2FA = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const email = <string>req.body.email;
+    const isSet = await authService.twoFactor.disable2FA(email);
+    if (isSet) {
+      res.json({ email });
+    } else return next({ status: '500', message: 'Could not disable 2FA' });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+// const generateSecret = (req: Request, res: Response, next: NextFunction) => {
+//   try {
+//     const email = <string>req.body.email;
+//     const secret = authService.twoFactor.generateSecret({ name: 'Chat room typescript', account: email });
+//     if (secret) {
+//       res.json({ secret });
+//     } else return next({ status: '500', message: 'Could not generate secret' });
+
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+export { login, token, signUp, logout, enable2FA, disable2FA };

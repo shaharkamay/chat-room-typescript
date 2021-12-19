@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestHeaders } from "axios";
 import React, { useCallback, useState, useEffect } from "react";
 import BASE_URL from "../index";
 import { AuthContextInterface } from "../types/auth";
@@ -29,8 +29,11 @@ export const AuthProvider = ({ children }: any) => {
         try {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const { data } = await askForNewToken(refreshToken);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           setAccessToken(data.accessToken);
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           localStorage.setItem("access", data.accessToken || '');
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           setEmail(data.email);
           setLoggedIn(true);
         } catch (error) {
@@ -41,16 +44,24 @@ export const AuthProvider = ({ children }: any) => {
     })();
   }, [refreshToken, askForNewToken, loggedIn]);
 
-  const login = useCallback(async ({ email, password }: { email: string, password: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const login = useCallback(async ({ email, password }: { email: string, password: string }, headers: AxiosRequestHeaders | undefined = undefined): Promise<any> => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { data } = await axios.post(`${BASE_URL}/api/auth/login`, {
         email,
         password,
-      });
+      }, { headers });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      if (data.secret) return data.secret;
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       setRefreshToken(data.refreshToken);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       setAccessToken(data.accessToken);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       localStorage.setItem("refresh", data.refreshToken);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       localStorage.setItem("access", data.accessToken);
       setEmail(email);
       setLoggedIn(true);
@@ -103,16 +114,3 @@ export const AuthProvider = ({ children }: any) => {
     </AuthContext.Provider>
   );
 };
-
-// export const Auth = ({ children }) => (
-//   <AuthContext.Consumer>{{ children }}</AuthContext.Consumer>
-// );
-
-// export const useAuth = () => {
-//   const { loggedIn } = useContext(AuthContext);
-//   const navigate = useNavigate();
-//   useEffect(() => {
-//     if (!loggedIn) navigate("/login");
-//   }, [loggedIn, navigate]);
-//   return loggedIn;
-// };

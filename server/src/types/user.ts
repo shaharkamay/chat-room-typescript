@@ -4,6 +4,7 @@ export type User = {
   lastName: string,
   email: string,
   password: string,
+  '2FA'?: boolean | undefined,
 };
 
 export type NewUser = Omit<User, "id">;
@@ -17,6 +18,9 @@ export type NewUserFields = {
   password: unknown,
 };
 
-// export type AuthenticatedUser = Omit<User, "firstName" | "lastName" | "password">;
+export type TwoFactorOptions = {
+  name: string,
+  account: string,
+};
 
 export type LoggedUserFields = Omit<NewUserFields, "firstName" | "lastName">;
