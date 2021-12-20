@@ -19,6 +19,11 @@ const UserSchema: Schema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	'2FA': {
+		type: Boolean,
+		required: true,
+		default: false,
+	}
 });
 
 UserSchema.set("toJSON", {
@@ -30,4 +35,4 @@ UserSchema.set("toJSON", {
 });
 
 const User = mongoose.model<User>('User', UserSchema);
-export default User ;
+export default User;

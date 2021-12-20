@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import validator from 'validator';
+import UserModel from '../models/user';
+import authService from '../services/auth';
 
 const validateSignUp = (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -29,4 +31,29 @@ const validateLogin = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export { validateSignUp, validateLogin };
+const validate2FA = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const email = <string>req.body.email;
+    const user = await UserModel.findOne({ email });
+    if (user && !user['2FA']) return next();
+
+    const twoFactorSecret = <string>req.headers.twofactorsecret;
+    const twoFactorToken = <string>req.headers.twofactortoken;
+    if (twoFactorSecret && twoFactorToken) {
+      const isValid: { delta: number } | null = authService.twoFactor.verifyToken(twoFactorSecret, twoFactorToken);
+      if (isValid && isValid.delta === 0) {
+        next();
+      } else {
+        next({ status: 401, message: '2FA did not succeeded' });
+      }
+    } else {
+      const secret = authService.twoFactor.generateSecret({ name: 'Chat room typescript', account: email });
+      res.json({ secret });
+      res.end();
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { validateSignUp, validateLogin, validate2FA };

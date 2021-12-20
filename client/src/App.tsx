@@ -9,6 +9,7 @@ import Footer from "./components/footer/Footer";
 import { AuthProvider } from './contexts/AuthContext';
 import Hello from "./components/hello/Hello";
 import SignUp from "./pages/sign-up/SignUp";
+import TwoFactor from "./pages/login/TwoFactor";
 
 function App() {
 
@@ -33,6 +34,7 @@ function App() {
 
                 {/* Login Route */}
                 <Route path="/login" element={<Login />} />
+                <Route path="/2FA" element={<TwoFactor />} />
 
                 {/* Sign Up Route */}
                 <Route path="/sign-up" element={<SignUp />} />
