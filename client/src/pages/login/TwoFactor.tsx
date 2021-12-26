@@ -12,6 +12,7 @@ function TwoFactor() {
   const loggedIn = authContext?.loggedIn;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const login = authContext?.login;
+  const enable2FA = authContext?.enable2FA;
 
   const [token, setToken] = useState('');
 
@@ -21,15 +22,15 @@ function TwoFactor() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (loggedIn) navigate('/');
+    if (loggedIn && state.email) navigate('/');
   }, [loggedIn, navigate]);
 
   const formElements: FormElementType[] = [
     {
-      labelValue: "Code",
-      type: "text",
-      id: "code",
-      placeholder: "Enter code",
+      labelValue: 'Code',
+      type: 'text',
+      id: 'code',
+      placeholder: 'Enter code',
       state: token,
       setState: setToken,
       handleBlur: (e, setError) => {
@@ -37,23 +38,40 @@ function TwoFactor() {
         if (!validator.isNumeric(e.target.value)) {
           setError('Invalid code');
         } else setError('');
-      }
+      },
     },
   ];
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (login) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-      await login({ email: state.email, password: state.password }, { twoFactorToken: token, twoFactorSecret: state.secret.secret });
+    if ('secret' in state && enable2FA) {
+      const is2FAEnabled = await enable2FA({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        twofactorsecret: state.secret.secret,
+        twofactortoken: token,
+      });
+      if (is2FAEnabled) navigate('/');
+      else throw '2FA did not succeeded';
+    } else {
+      if (login) {
+        await login(
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+          { email: state.email, password: state.password },
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+          { twoFactorToken: token }
+        );
+      }
     }
   };
 
-
   return (
     <div>
-      {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment  */}
-      <img className='qr-img' src={state.secret.qr} alt='QR' />
+      {state.secret ? (
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment  */
+        <img className="qr-img" src={state.secret.qr} alt="QR" />
+      ) : (
+        ''
+      )}
       <Form
         containerClass="two-factor-container"
         id="two-factor-form"

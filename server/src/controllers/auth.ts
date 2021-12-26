@@ -26,9 +26,16 @@ const token = async (req: Request, res: Response, next: NextFunction) => {
 
 const signUp = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { firstName, lastName, email, password } = <Record<string, string>>req.body;
+    const { firstName, lastName, email, password } = <Record<string, string>>(
+      req.body
+    );
 
-    const isSignedUp = await authService.signUp(firstName, lastName, email, password);
+    const isSignedUp = await authService.signUp(
+      firstName,
+      lastName,
+      email,
+      password
+    );
     res.send({ isSignedUp });
   } catch (err) {
     next(err);
@@ -46,25 +53,33 @@ const logout = async (_req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const check2FA = async (req: Request, res: Response, next: NextFunction) => {
+const create2FASecret = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const email = <string>res.locals.user.email;
-    console.log(email);
-    const is2FAEnabled = await authService.twoFactor.check2FA(email);
-    res.json({ is2FAEnabled });
+    const secret = await authService.twoFactor.create2FASecret(email);
+    res.json({ secret });
   } catch (error) {
     next(error);
   }
 };
 
-const enable2FA = async (_req: Request, res: Response, next: NextFunction) => {
+const enable2FA = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const twoFactorSecret = <string>req.headers.twofactorsecret;
+    const twoFactorToken = <string>req.headers.twofactortoken;
     const email = <string>res.locals.user.email;
-    const is2FAEnabled = await authService.twoFactor.enable2FA(email);
-    if (is2FAEnabled) {
-      res.json({ is2FAEnabled });
+    const user = await authService.twoFactor.enable2FA(
+      email,
+      twoFactorSecret,
+      twoFactorToken
+    );
+    if (user) {
+      res.json({ is2FAEnabled: true });
     } else return next({ status: '500', message: 'Could not enable 2FA' });
-
   } catch (error) {
     next(error);
   }
@@ -77,7 +92,6 @@ const disable2FA = async (_req: Request, res: Response, next: NextFunction) => {
     if (is2FADisabled) {
       res.json({ is2FADisabled });
     } else return next({ status: '500', message: 'Could not disable 2FA' });
-
   } catch (error) {
     next(error);
   }
@@ -96,4 +110,4 @@ const disable2FA = async (_req: Request, res: Response, next: NextFunction) => {
 //   }
 // };
 
-export { login, token, signUp, logout, check2FA, enable2FA, disable2FA };
+export { login, token, signUp, logout, create2FASecret, enable2FA, disable2FA };
