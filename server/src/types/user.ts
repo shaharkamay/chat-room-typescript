@@ -9,7 +9,7 @@ export type User = {
 
 export type NewUser = Omit<User, 'id'>;
 
-export type LoggedUser = Omit<NewUser, 'firstName' | 'lastName'>;
+export type LoggedUser = Omit<NewUser, 'firstName' | 'lastName' | 'secret2FA'>;
 
 export type NewUserFields = {
   firstName: unknown;

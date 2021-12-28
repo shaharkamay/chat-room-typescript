@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logout = exports.signUp = exports.token = exports.login = void 0;
+exports.disable2FA = exports.enable2FA = exports.create2FASecret = exports.logout = exports.signUp = exports.token = exports.login = void 0;
 const auth_1 = __importDefault(require("../services/auth"));
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -38,7 +38,7 @@ const token = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
 exports.token = token;
 const signUp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password } = (req.body);
         const isSignedUp = yield auth_1.default.signUp(firstName, lastName, email, password);
         res.send({ isSignedUp });
     }
@@ -58,3 +58,46 @@ const logout = (_req, res, next) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.logout = logout;
+const create2FASecret = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const email = res.locals.user.email;
+        const secret = yield auth_1.default.twoFactor.create2FASecret(email);
+        res.json({ secret });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.create2FASecret = create2FASecret;
+const enable2FA = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const twoFactorSecret = req.headers.twofactorsecret;
+        const twoFactorToken = req.headers.twofactortoken;
+        const email = res.locals.user.email;
+        const user = yield auth_1.default.twoFactor.enable2FA(email, twoFactorSecret, twoFactorToken);
+        if (user) {
+            res.json({ is2FAEnabled: true });
+        }
+        else
+            return next({ status: '500', message: 'Could not enable 2FA' });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.enable2FA = enable2FA;
+const disable2FA = (_req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const email = res.locals.user.email;
+        const is2FADisabled = yield auth_1.default.twoFactor.disable2FA(email);
+        if (is2FADisabled) {
+            res.json({ is2FADisabled });
+        }
+        else
+            return next({ status: '500', message: 'Could not disable 2FA' });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.disable2FA = disable2FA;
