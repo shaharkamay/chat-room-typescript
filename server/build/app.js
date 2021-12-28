@@ -12,7 +12,7 @@ const app = (0, express_1.default)();
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
-app.use(express_1.default.static('../client/build'));
+app.use(express_1.default.static('../app/client/build'));
 app.get('/', app_1.render);
 app.get('/login', app_1.render);
 app.get('/sign-up', app_1.render);

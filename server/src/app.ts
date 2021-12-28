@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-app.use(express.static('../client/build'));
+app.use(express.static('../app/client/build'));
 app.get('/', render);
 
 app.get('/login', render);
