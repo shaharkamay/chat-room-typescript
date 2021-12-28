@@ -18,12 +18,12 @@ const user_1 = __importDefault(require("../models/user"));
 const auth_1 = __importDefault(require("../services/auth"));
 const validateSignUp = (req, res, next) => {
     try {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password } = (req.body);
         res.locals.validated =
-            validator_1.default.isAlpha(firstName)
-                && validator_1.default.isAlpha(lastName)
-                && validator_1.default.isEmail(email)
-                && validator_1.default.isStrongPassword(password, { minSymbols: 0 });
+            validator_1.default.isAlpha(firstName) &&
+                validator_1.default.isAlpha(lastName) &&
+                validator_1.default.isEmail(email) &&
+                validator_1.default.isStrongPassword(password, { minSymbols: 0 });
         if (res.locals.validated)
             next();
         else
@@ -38,7 +38,9 @@ const validateLogin = (req, res, next) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
-        res.locals.validated = validator_1.default.isEmail(email) && validator_1.default.isStrongPassword(password, { minSymbols: 0 });
+        res.locals.validated =
+            validator_1.default.isEmail(email) &&
+                validator_1.default.isStrongPassword(password, { minSymbols: 0 });
         if (res.locals.validated)
             next();
         else
@@ -52,10 +54,12 @@ exports.validateLogin = validateLogin;
 const validate2FA = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const email = req.body.email;
-        const user = yield user_1.default.findOne({ email });
-        if (user && !user['2FA'])
+        const user = (yield user_1.default.findOne({ email }));
+        if (user && user.secret2FA === '')
             return next();
-        const twoFactorSecret = req.headers.twofactorsecret;
+        else if (!('twofactortoken' in req.headers))
+            return res.json({ is2FAEnabled: true });
+        const twoFactorSecret = user.secret2FA;
         const twoFactorToken = req.headers.twofactortoken;
         if (twoFactorSecret && twoFactorToken) {
             const isValid = auth_1.default.twoFactor.verifyToken(twoFactorSecret, twoFactorToken);
@@ -65,11 +69,6 @@ const validate2FA = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
             else {
                 next({ status: 401, message: '2FA did not succeeded' });
             }
-        }
-        else {
-            const secret = auth_1.default.twoFactor.generateSecret({ name: 'Chat room typescript', account: email });
-            res.json({ secret });
-            res.end();
         }
     }
     catch (error) {

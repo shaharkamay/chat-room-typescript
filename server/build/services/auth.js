@@ -18,11 +18,11 @@ const token_1 = __importDefault(require("../models/token"));
 const user_1 = __importDefault(require("../models/user"));
 const twofactor = require("node-2fa");
 const login = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = (yield user_1.default.findOne({ email }));
+    const user = yield user_1.default.findOne({ email });
     if (!user)
-        throw { status: 400, message: "No such email" };
+        throw { status: 400, message: 'No such email' };
     if (!(password === user.password))
-        throw { status: 400, message: "Bad password" };
+        throw { status: 400, message: 'Bad password' };
     const userId = user.id;
     const accessToken = jsonwebtoken_1.default.sign({ email, userId }, config_1.default.jwt.secret, {
         expiresIn: config_1.default.jwt.accessTime,
@@ -35,11 +35,11 @@ const login = (email, password) => __awaiter(void 0, void 0, void 0, function* (
 });
 const token = (token) => __awaiter(void 0, void 0, void 0, function* () {
     if (!token)
-        throw { status: 400, message: "Must provide a token" };
-    const { email, userId } = jsonwebtoken_1.default.verify(token, config_1.default.jwt.secret);
+        throw { status: 400, message: 'Must provide a token' };
+    const { email, userId } = (jsonwebtoken_1.default.verify(token, config_1.default.jwt.secret));
     const exists = yield token_1.default.findOne({ jwt: token });
     if (!exists)
-        throw { status: 400, message: "Log in again" };
+        throw { status: 400, message: 'Log in again' };
     const accessToken = jsonwebtoken_1.default.sign({ email, userId }, config_1.default.jwt.secret, {
         expiresIn: config_1.default.jwt.accessTime,
     });
@@ -48,7 +48,7 @@ const token = (token) => __awaiter(void 0, void 0, void 0, function* () {
 const signUp = (firstName, lastName, email, password) => __awaiter(void 0, void 0, void 0, function* () {
     const exists = yield user_1.default.find({ email });
     if (exists.length > 0)
-        throw { status: 400, message: "email already exists" };
+        throw { status: 400, message: 'email already exists' };
     const user = yield user_1.default.create({
         first_name: firstName,
         last_name: lastName,
@@ -78,27 +78,39 @@ const generateToken = (secret) => {
 const verifyToken = (secret, token) => {
     return twofactor.verifyToken(secret, token);
 };
-const check2FA = (email) => __awaiter(void 0, void 0, void 0, function* () {
+const create2FASecret = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_1.default.findOne({ email });
-    if (user && user['2FA'])
-        return user['2FA'];
-    return false;
+    if (user) {
+        if (user.secret2FA !== '')
+            return { secret: user.secret2FA };
+    }
+    const secret = generateSecret({
+        name: 'Chat room typescript',
+        account: email,
+    });
+    return secret;
 });
-const enable2FA = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_1.default.findOneAndUpdate({ email }, { '2FA': true });
-    return user ? true : false;
+const enable2FA = (email, secret, token) => __awaiter(void 0, void 0, void 0, function* () {
+    const isValid = verifyToken(secret, token);
+    if (isValid && isValid.delta === 0) {
+        const user = (yield user_1.default.findOneAndUpdate({ email }, { secret2FA: secret }));
+        return user;
+    }
+    else {
+        throw { status: 401, message: '2FA did not succeeded' };
+    }
 });
 const disable2FA = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_1.default.findOneAndUpdate({ email }, { '2FA': false });
+    const user = yield user_1.default.findOneAndUpdate({ email }, { secret2FA: '' });
     return user ? true : false;
 });
 const twoFactor = {
     generateSecret,
     generateToken,
     verifyToken,
-    check2FA,
+    create2FASecret,
     enable2FA,
-    disable2FA
+    disable2FA,
 };
 exports.default = {
     login,

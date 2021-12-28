@@ -22,16 +22,15 @@ const UserSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
-    '2FA': {
-        type: Boolean,
-        required: true,
-        default: false,
-    }
+    secret2FA: {
+        type: String,
+        default: '',
+    },
 });
-UserSchema.set("toJSON", {
+UserSchema.set('toJSON', {
     transform: (_, returnedObject) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        returnedObject.id = (returnedObject._id.toString());
+        returnedObject.id = returnedObject._id.toString();
         delete returnedObject._id;
     },
 });

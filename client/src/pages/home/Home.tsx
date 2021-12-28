@@ -1,39 +1,67 @@
-import React, { ChangeEvent, useContext } from "react";
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../assets/styles/home.scss';
-import { AuthContext } from "../../contexts/AuthContext";
+import { AuthContext } from '../../contexts/AuthContext';
 //039724400
 
 function Home() {
   const authContext = useContext(AuthContext);
-  const enable2FA = authContext?.enable2FA;
+  const get2FASecret = authContext?.get2FASecret;
   const disable2FA = authContext?.disable2FA;
   const email = authContext?.email;
   const is2FAEnabled = authContext?.is2FAEnabled || false;
 
+  const navigate = useNavigate();
 
-  const handle2FACheck = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handle2FAEnable = async () => {
     if (typeof email === 'string') {
-      if (e.target.checked) {
-        if (enable2FA) {
-          await enable2FA();
-        }
-      } else {
-        if (disable2FA) {
-          await disable2FA();
-        }
+      if (get2FASecret) {
+        const data = await get2FASecret();
+        navigate('/2FA', {
+          state: {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            secret: data.secret,
+          },
+        });
+      }
+    }
+  };
+
+  const handle2FADisable = async () => {
+    if (typeof email === 'string') {
+      if (disable2FA) {
+        await disable2FA();
       }
     }
   };
 
   return (
     <div>
-      {email
-        ? <div className="two-factor">
-          <label htmlFor='two-factor' >2FA</label>
-          <input id='two-factor' type={'checkbox'} onChange={handle2FACheck} checked={is2FAEnabled} />
+      {email ? (
+        <div className="two-factor">
+          {is2FAEnabled ? (
+            <button
+              className="default--button"
+              style={{ width: '100px' }}
+              id="disable-two-factor"
+              onClick={handle2FADisable}
+            >
+              Disable 2FA
+            </button>
+          ) : (
+            <button
+              className="default--button"
+              style={{ width: '100px' }}
+              id="enable-two-factor"
+              onClick={handle2FAEnable}
+            >
+              Enable 2FA
+            </button>
+          )}
         </div>
-        : ''
-      }
+      ) : (
+        ''
+      )}
     </div>
   );
 }

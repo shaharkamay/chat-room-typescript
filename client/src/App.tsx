@@ -1,20 +1,19 @@
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import React, { useState } from "react";
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import React, { useState } from 'react';
 import ThemeContext from './contexts/ThemeContext';
-import Header from "./components/header/Header";
-import Home from "./pages/home/Home";
-import Chat from "./pages/chat/Chat";
-import Login from "./pages/login/Login";
-import Footer from "./components/footer/Footer";
+import Header from './components/header/Header';
+import Home from './pages/home/Home';
+import Chat from './pages/chat/Chat';
+import Login from './pages/login/Login';
+import Footer from './components/footer/Footer';
 import { AuthProvider } from './contexts/AuthContext';
-import Hello from "./components/hello/Hello";
-import SignUp from "./pages/sign-up/SignUp";
-import TwoFactor from "./pages/login/TwoFactor";
+import Hello from './components/hello/Hello';
+import SignUp from './pages/sign-up/SignUp';
+import TwoFactor from './pages/login/TwoFactor';
 
 function App() {
-
   const [theme, setTheme] = useState(
-    localStorage.getItem("theme") || "theme-auto"
+    localStorage.getItem('theme') || 'theme-auto'
   );
 
   return (
@@ -45,7 +44,6 @@ function App() {
             </main>
             <Footer />
           </BrowserRouter>
-
         </div>
       </ThemeContext.Provider>
     </AuthProvider>
