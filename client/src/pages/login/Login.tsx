@@ -1,10 +1,10 @@
-import React, { useState, useContext, useEffect, FormEvent } from "react";
+import React, { useState, useContext, useEffect, FormEvent } from 'react';
 import { AuthContext } from '../../contexts/AuthContext';
-import { useNavigate } from "react-router-dom";
-import Form from "../../components/form/Form";
+import { useNavigate } from 'react-router-dom';
+import Form from '../../components/form/Form';
 import '../../assets/styles/login.scss';
 import validator from 'validator';
-import { FormElementType } from "../../types/form";
+import { FormElementType } from '../../types/form';
 
 function Login() {
   const authContext = useContext(AuthContext);
@@ -24,10 +24,10 @@ function Login() {
 
   const formElements: FormElementType[] = [
     {
-      labelValue: "Email",
-      type: "email",
-      id: "email",
-      placeholder: "Enter Email",
+      labelValue: 'Email',
+      type: 'email',
+      id: 'email',
+      placeholder: 'Enter Email',
       state: email,
       setState: setEmail,
       handleBlur: (e, setError) => {
@@ -35,41 +35,50 @@ function Login() {
         if (!validator.isEmail(e.target.value)) {
           setError('Invalid email');
         } else setError('');
-      }
+      },
     },
     {
-      labelValue: "Password",
-      type: "password",
-      id: "password",
-      placeholder: "Enter Password",
+      labelValue: 'Password',
+      type: 'password',
+      id: 'password',
+      placeholder: 'Enter Password',
       state: password,
       setState: setPassword,
       handleBlur: (e, setError) => {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         if (!validator.isStrongPassword(e.target.value, { minSymbols: 0 })) {
-          setError('Password must contain at least one uppercase, one lowercase and one number');
+          setError(
+            'Password must contain at least one uppercase, one lowercase and one number'
+          );
         } else setError('');
-      }
+      },
     },
   ];
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (login) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      // navigate('/2FA', {
+      //   state: {
+      //     email,
+      //     password,
+      //   },
+      // });
+      // }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const secret = await login({ email, password });
-      if (secret) navigate('/2FA', {
-        state: {
-          email,
-          password,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          secret: secret
-        }
-      });
+      const is2FAEnabled = await login({ email, password });
+      if (is2FAEnabled) {
+        navigate('/2FA', {
+          state: {
+            email,
+            password,
+          },
+        });
+      } else {
+        navigate('/');
+      }
     }
   };
-
 
   return (
     <Form
