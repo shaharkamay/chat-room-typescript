@@ -1,6 +1,6 @@
 import { Routes, Route, BrowserRouter } from 'react-router-dom';
-import React, { useState } from 'react';
-import ThemeContext from './contexts/ThemeContext';
+import React from 'react';
+// import ThemeContext from './contexts/ThemeContext';
 import Header from './components/header/Header';
 import Home from './pages/home/Home';
 import Chat from './pages/chat/Chat';
@@ -10,15 +10,16 @@ import { AuthProvider } from './contexts/AuthContext';
 import Hello from './components/hello/Hello';
 import SignUp from './pages/sign-up/SignUp';
 import TwoFactor from './pages/login/TwoFactor';
+import { connect } from 'react-redux';
 
-function App() {
-  const [theme, setTheme] = useState(
-    localStorage.getItem('theme') || 'theme-auto'
-  );
-
+function App({ theme }: { theme: string }) {
+  // const [theme, setTheme] = useState(
+  //   localStorage.getItem('theme') || 'theme-auto'
+  // );
+  console.log(theme);
   return (
     <AuthProvider>
-      <ThemeContext.Provider value={{ theme, setTheme }}>
+      {/* <ThemeContext.Provider value={{ theme, setTheme }}> */}
         <div className={`App ${theme}`}>
           <BrowserRouter>
             <Header />
@@ -45,9 +46,15 @@ function App() {
             <Footer />
           </BrowserRouter>
         </div>
-      </ThemeContext.Provider>
+      {/* </ThemeContext.Provider> */}
     </AuthProvider>
   );
 }
 
-export default App;
+const mapStateToProps = (state: { theme: string }) => {
+  return {
+    theme: state.theme
+  };
+};
+
+export default connect(mapStateToProps)(App);

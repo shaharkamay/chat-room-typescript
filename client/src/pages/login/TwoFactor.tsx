@@ -17,7 +17,7 @@ function TwoFactor() {
   const [token, setToken] = useState('');
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { state } = useLocation();
+  const { state } = useLocation() as { state: { email: string, password: string, secret: { secret: string, qr: string } } };
 
   const navigate = useNavigate();
 
@@ -47,7 +47,7 @@ function TwoFactor() {
     if ('secret' in state && enable2FA) {
       const is2FAEnabled = await enable2FA({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        twofactorsecret: state.secret.secret,
+            twofactorsecret: state.secret.secret,
         twofactortoken: token,
       });
       if (is2FAEnabled) navigate('/');
@@ -56,7 +56,7 @@ function TwoFactor() {
       if (login) {
         await login(
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-          { email: state.email, password: state.password },
+                { email: state.email, password: state.password },
           // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
           { twoFactorToken: token }
         );
@@ -78,6 +78,7 @@ function TwoFactor() {
         title="two-factor"
         formElements={formElements}
         submitValue="Verify"
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
         handleSubmit={handleSubmit}
       />
     </div>
